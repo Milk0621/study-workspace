@@ -48,3 +48,17 @@
 ## Filter 구조
 - `DelegatingFilterProxy` -> `FilterChainProxy` -> `SecurityFilterChain` -> 다수의 Security Filter 실행
 - 요청 URL 패턴별로 적절한 `SecurityFilterChain`이 선택됨
+
+## DelegatingFilterProxy & FilterChainProxy
+Servlet 컨테이너와 Spring 컨테이너가 따로 존재하기 때문에, 스프링 빈으로 등록된 필터를 바로 Servlet이 알 수 없음
+
+- **DelegatingFilterProxy**
+    - Spring Security가 제공하는 Servlet Filter 구현체
+    - Servlet 컨테이너(Filter)와 Spring 컨테이너(Bean Filter) 사이를 연결하는 **다리** 역할
+    - 요청/응답을 받아서 스프링 빈으로 등록된 보안 필터(`CorsFilter`, `JwtFilter`, …)로 위임
+- **FilterChainProxy**
+    - DelegatingFilterProxy 내부에 존재
+    - 여러 `SecurityFilterChain`을 관리하며, 요청 URL 패턴에 따라 어떤 SecurityFilterChain을 실행할지 결정
+    - SecurityFilterChain 내부의 SecurityFilter들을 순서대로 실행
+
+`DelegatingFilterProxy` → `FilterChainProxy` → `SecurityFilterChain` → 여러 Security Filter 실행
